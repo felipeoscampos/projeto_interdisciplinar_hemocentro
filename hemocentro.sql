@@ -1,6 +1,6 @@
 -- =============================================
 -- Banco de dados: Hemocentro (SQL Server)
--- Criacao das tabelas a partir do DER
+-- Criação das tabelas com Clean Code, Null-Safety e Controle de Quantidade de Bolsas
 -- Atencao: se o banco Hemocentro ja existir, ele e apagado (com os dados)
 -- e criado de novo; as outras conexoes com ele sao encerradas
 -- =============================================
@@ -32,8 +32,8 @@ CREATE TABLE Endereco (
     uf           CHAR(2)      NOT NULL
 );
 
-CREATE TABLE TipoSang (
-    tipo VARCHAR(3) PRIMARY KEY
+CREATE TABLE TipoSanguineo (
+    tipo VARCHAR(15) PRIMARY KEY
 );
 
 CREATE TABLE Hemocomponente (
@@ -55,8 +55,8 @@ CREATE TABLE Pessoa (
 -- Especializacoes de Pessoa: a chave e a mesma da pessoa
 -- Possui: cada doador tem um tipo sanguineo
 CREATE TABLE Doador (
-    cod_pessoa     INT        PRIMARY KEY REFERENCES Pessoa (cod_pessoa) ON DELETE CASCADE,
-    tipo_sanguineo VARCHAR(3) NOT NULL REFERENCES TipoSang (tipo)
+    cod_pessoa     INT         PRIMARY KEY REFERENCES Pessoa (cod_pessoa) ON DELETE CASCADE,
+    tipo_sanguineo VARCHAR(15) NOT NULL REFERENCES TipoSanguineo (tipo)
 );
 
 CREATE TABLE Funcionario (
@@ -85,21 +85,25 @@ CREATE TABLE Pedido (
     num_pedido       INT IDENTITY(1,1) PRIMARY KEY,
     data_solicitacao DATE        NOT NULL,
     data_envio       DATE        NULL,
-    status           VARCHAR(30) NOT NULL,
+    status           VARCHAR(30) NOT NULL DEFAULT 'PENDENTE'
+                     CHECK (status IN ('PENDENTE', 'EM_ATENDIMENTO', 'ATENDIDO', 'CANCELADO')),
     cod_hospital     INT         NOT NULL REFERENCES Hospital (cod_hospital)
 );
 
--- Tem (N:N): os tipos sanguineos de cada pedido
-CREATE TABLE Tem (
-    num_pedido     INT        NOT NULL REFERENCES Pedido (num_pedido),
-    tipo_sanguineo VARCHAR(3) NOT NULL REFERENCES TipoSang (tipo),
-    PRIMARY KEY (num_pedido, tipo_sanguineo)
+-- PedidoSangue (N:N): os tipos sanguineos e as quantidades de bolsas de cada pedido
+CREATE TABLE PedidoSangue (
+    num_pedido            INT         NOT NULL REFERENCES Pedido (num_pedido) ON DELETE CASCADE,
+    tipo_sanguineo        VARCHAR(15) NOT NULL REFERENCES TipoSanguineo (tipo),
+    quantidade_solicitada INT         NOT NULL CHECK (quantidade_solicitada > 0),
+    quantidade_atendida   INT         NOT NULL DEFAULT 0 CHECK (quantidade_atendida >= 0),
+    PRIMARY KEY (num_pedido, tipo_sanguineo),
+    CHECK (quantidade_atendida <= quantidade_solicitada)
 );
 
 -- ---------- Coletas, analises e hemocomponentes ----------
 
 -- Realiza e Coleta: cada coleta (bolsa) tem um doador e um funcionario
--- Gera: num_pedido fica vazio ate a bolsa ser enviada
+-- Gera: num_pedido fica vazio ate a bolsa ser enviada/baixada
 CREATE TABLE Coleta (
     cod_coleta      INT IDENTITY(1,1) PRIMARY KEY,
     data_coleta     DATE        NOT NULL,
@@ -115,7 +119,8 @@ CREATE TABLE Coleta (
 -- Faz: cada analise e feita por um tecnico
 CREATE TABLE Analise (
     cod_analise INT IDENTITY(1,1) PRIMARY KEY,
-    status      VARCHAR(30) NOT NULL,
+    status      VARCHAR(30) NOT NULL DEFAULT 'EM_ANALISE'
+                CHECK (status IN ('EM_ANALISE', 'APROVADA', 'REPROVADA')),
     cod_coleta  INT         NOT NULL UNIQUE REFERENCES Coleta (cod_coleta),
     cod_tecnico INT         NOT NULL REFERENCES Tecnico (cod_pessoa)
 );
@@ -123,16 +128,16 @@ CREATE TABLE Analise (
 -- Produz (N:N): vira tabela; a chave junta a analise e o hemocomponente,
 -- e volume_ml e o atributo do relacionamento
 CREATE TABLE Produz (
-    cod_analise          INT        NOT NULL REFERENCES Analise (cod_analise),
-    sigla_hemocomponente VARCHAR(5) NOT NULL REFERENCES Hemocomponente (sigla),
-    volume_ml            INT        NOT NULL,
+    cod_analise          INT           NOT NULL REFERENCES Analise (cod_analise),
+    sigla_hemocomponente VARCHAR(5)    NOT NULL REFERENCES Hemocomponente (sigla),
+    volume_ml            DECIMAL(6,2)  NOT NULL CHECK (volume_ml > 0),
     PRIMARY KEY (cod_analise, sigla_hemocomponente)
 );
 
 -- ---------- Dados iniciais ----------
 
-INSERT INTO TipoSang (tipo) VALUES
-    ('A+'), ('A-'), ('B+'), ('B-'), ('AB+'), ('AB-'), ('O+'), ('O-');
+INSERT INTO TipoSanguineo (tipo) VALUES
+    ('A+'), ('A-'), ('B+'), ('B-'), ('AB+'), ('AB-'), ('O+'), ('O-'), ('Não informado');
 
 INSERT INTO Hemocomponente (sigla, nome) VALUES
     ('CH',   'Concentrado de Hemácias'),

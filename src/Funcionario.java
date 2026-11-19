@@ -3,7 +3,7 @@ public class Funcionario extends Pessoa {
 
     public Funcionario() {
         super();
-        salario = 0;
+        this.salario = 0.0;
     }
 
     public Funcionario(int codigo, String nome, String cpf, String telefone, Endereco endereco, double salario) {
@@ -18,5 +18,4 @@ public class Funcionario extends Pessoa {
     public void setSalario(double salario) {
         this.salario = salario;
     }
-
 }

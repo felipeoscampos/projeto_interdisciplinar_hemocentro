@@ -3,24 +3,24 @@ import java.util.List;
 
 public class Analise {
     private int codigo;
-    private String status;
+    private StatusAnalise status;
     private Coleta coleta;
     private Tecnico tecnico;
     private List<Producao> producao;
 
     public Analise() {
-        codigo = 0;
-        status = "";
-        coleta = null;
-        tecnico = null;
-        producao = new ArrayList<>();
+        this.codigo = 0;
+        this.status = StatusAnalise.EM_ANALISE;
+        this.coleta = new Coleta();
+        this.tecnico = new Tecnico();
+        this.producao = new ArrayList<>();
     }
 
-    public Analise(int codigo, String status, Coleta coleta, Tecnico tecnico) {
+    public Analise(int codigo, StatusAnalise status, Coleta coleta, Tecnico tecnico) {
         this.codigo = codigo;
         this.status = status;
-        this.coleta = coleta;
-        this.tecnico = tecnico;
+        this.coleta = (coleta != null) ? coleta : new Coleta();
+        this.tecnico = (tecnico != null) ? tecnico : new Tecnico();
         this.producao = new ArrayList<>();
     }
 
@@ -32,11 +32,11 @@ public class Analise {
         this.codigo = codigo;
     }
 
-    public String getStatus() {
+    public StatusAnalise getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusAnalise status) {
         this.status = status;
     }
 
@@ -64,8 +64,7 @@ public class Analise {
         this.producao = producao;
     }
 
-    public void adicionarProducao(Hemocomponente hemocomponente, int volumeMl) {
+    public void adicionarProducao(Hemocomponente hemocomponente, double volumeMl) {
         this.producao.add(new Producao(this, hemocomponente, volumeMl));
     }
-
 }

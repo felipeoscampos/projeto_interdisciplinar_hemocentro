@@ -5,17 +5,17 @@ public class Hospital {
     private Endereco endereco;
 
     public Hospital() {
-        codigo = 0;
-        razaoSocial = "";
-        cnpj = "";
-        endereco = null;
+        this.codigo = 0;
+        this.razaoSocial = "";
+        this.cnpj = "";
+        this.endereco = new Endereco();
     }
 
     public Hospital(int codigo, String razaoSocial, String cnpj, Endereco endereco) {
         this.codigo = codigo;
         this.razaoSocial = razaoSocial;
         this.cnpj = cnpj;
-        this.endereco = endereco;
+        this.endereco = (endereco != null) ? endereco : new Endereco();
     }
 
     public int getCodigo() {
@@ -49,5 +49,4 @@ public class Hospital {
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
-
 }

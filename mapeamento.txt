@@ -1,0 +1,53 @@
+-- chave primária <u>sublinhada</u>, chave estrangeira em *itálico*.
+
+**Endereco** (<u>cod_endereco</u>, logradouro, numero, cep, cidade, uf)
+
+**TipoSanguineo** (<u>tipo</u>)
+
+**Hemocomponente** (<u>sigla</u>, nome)
+- nome é único
+
+**Pessoa** (<u>cod_pessoa</u>, nome, cpf, telefone, *cod_endereco*)
+- *cod_endereco* referencia Endereco (Reside)
+- cpf é único
+
+**Doador** (<u>*cod_pessoa*</u>, *tipo_sanguineo*)
+- *cod_pessoa* referencia Pessoa (ON DELETE CASCADE)
+- *tipo_sanguineo* referencia TipoSanguineo (Possui); obrigatório (NOT NULL), usando 'Não informado' até o tipo ser identificado
+
+**Funcionario** (<u>*cod_pessoa*</u>, salario)
+- *cod_pessoa* referencia Pessoa (ON DELETE CASCADE)
+
+**Tecnico** (<u>*cod_pessoa*</u>, coren)
+- *cod_pessoa* referencia Pessoa (ON DELETE CASCADE)
+- coren é único
+
+**Hospital** (<u>cod_hospital</u>, razao_social, cnpj, *cod_endereco*)
+- *cod_endereco* referencia Endereco (Pertence)
+- cnpj é único
+
+**Pedido** (<u>num_pedido</u>, data_solicitacao, data_envio, status, *cod_hospital*)
+- *cod_hospital* referencia Hospital (Realiza)
+- data_envio aceita nulo (preenchida no despacho)
+- status: PENDENTE, EM_ATENDIMENTO, ATENDIDO ou CANCELADO (CHECK); padrão PENDENTE (DEFAULT)
+
+**PedidoSangue** (<u>*num_pedido*, *tipo_sanguineo*</u>, quantidade_solicitada, quantidade_atendida)
+- *num_pedido* referencia Pedido (ON DELETE CASCADE: o item não existe sem o pedido)
+- *tipo_sanguineo* referencia TipoSanguineo
+- quantidade_solicitada maior que zero; quantidade_atendida começa em 0 (DEFAULT), não pode ser negativa e não passa da solicitada (CHECK)
+
+**Coleta** (<u>cod_coleta</u>, data_coleta, data_validade, status, *cod_doador*, *cod_funcionario*, *num_pedido*)
+- *cod_doador* referencia Doador (Realiza)
+- *cod_funcionario* referencia Funcionario (Coleta: responsável pela coleta)
+- status: DISPONIVEL, DESCARTADA ou ENVIADA (CHECK); padrão DISPONIVEL (DEFAULT)
+- *num_pedido* referencia Pedido (Gera); aceita nulo (preenchido no despacho)
+
+**Analise** (<u>cod_analise</u>, status, *cod_coleta*, *cod_tecnico*)
+- status: EM_ANALISE, APROVADA ou REPROVADA (CHECK); padrão EM_ANALISE (DEFAULT)
+- *cod_coleta* referencia Coleta (Possui); é único (Possui é 1:1)
+- *cod_tecnico* referencia Tecnico (Faz)
+
+**Produz** (<u>*cod_analise*, *sigla_hemocomponente*</u>, volume_ml)
+- *cod_analise* referencia Analise
+- *sigla_hemocomponente* referencia Hemocomponente
+- volume_ml é o atributo do relacionamento: decimal, maior que zero (CHECK)

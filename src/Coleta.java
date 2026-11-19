@@ -10,13 +10,13 @@ public class Coleta {
     private Pedido pedido;
 
     public Coleta() {
-        codigo = 0;
-        dataColeta = null;
-        dataValidade = null;
-        status = StatusColeta.DISPONIVEL;
-        doador = null;
-        funcionario = null;
-        pedido = null;
+        this.codigo = 0;
+        this.dataColeta = LocalDate.now();
+        this.dataValidade = LocalDate.now().plusDays(35);
+        this.status = StatusColeta.DISPONIVEL;
+        this.doador = new Doador();
+        this.funcionario = new Funcionario();
+        this.pedido = new Pedido();
     }
 
     public Coleta(int codigo, LocalDate dataColeta, LocalDate dataValidade, StatusColeta status, Doador doador, Funcionario funcionario, Pedido pedido) {
@@ -24,9 +24,20 @@ public class Coleta {
         this.dataColeta = dataColeta;
         this.dataValidade = dataValidade;
         this.status = status;
-        this.doador = doador;
-        this.funcionario = funcionario;
-        this.pedido = pedido;
+        this.doador = (doador != null) ? doador : new Doador();
+        this.funcionario = (funcionario != null) ? funcionario : new Funcionario();
+        this.pedido = (pedido != null) ? pedido : new Pedido();
+    }
+
+    /**
+     * Verifica se a coleta já foi vinculada a um pedido real de hospital (código > 0).
+     */
+    public boolean temPedido() {
+        return this.pedido != null && this.pedido.getNumero() > 0;
+    }
+
+    public TipoSanguineo getTipoSanguineo() {
+        return (doador != null) ? doador.getTipoSanguineo() : TipoSanguineo.NAO_INFORMADO;
     }
 
     public int getCodigo() {
@@ -66,7 +77,7 @@ public class Coleta {
     }
 
     public void setDoador(Doador doador) {
-        this.doador = doador;
+        this.doador = (doador != null) ? doador : new Doador();
     }
 
     public Funcionario getFuncionario() {
@@ -74,7 +85,7 @@ public class Coleta {
     }
 
     public void setFuncionario(Funcionario funcionario) {
-        this.funcionario = funcionario;
+        this.funcionario = (funcionario != null) ? funcionario : new Funcionario();
     }
 
     public Pedido getPedido() {
@@ -82,7 +93,6 @@ public class Coleta {
     }
 
     public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
+        this.pedido = (pedido != null) ? pedido : new Pedido();
     }
-
 }

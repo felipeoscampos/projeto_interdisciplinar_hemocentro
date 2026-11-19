@@ -1,4 +1,4 @@
-# Diagrama de Classes — Hemocentro
+# Diagrama de Classes — Hemocentro (Clean Code & Null-Safety)
 
 ```mermaid
 classDiagram
@@ -48,11 +48,11 @@ classDiagram
     }
 
     class Doador {
-        -TipoSang tipoSanguineo
+        -TipoSanguineo tipoSanguineo
         +Doador()
-        +Doador(int, String, String, String, Endereco, TipoSang)
-        +getTipoSanguineo() TipoSang
-        +setTipoSanguineo(TipoSang) void
+        +Doador(int, String, String, String, Endereco, TipoSanguineo)
+        +getTipoSanguineo() TipoSanguineo
+        +setTipoSanguineo(TipoSanguineo) void
     }
 
     class Funcionario {
@@ -71,12 +71,19 @@ classDiagram
         +setCoren(String) void
     }
 
-    class TipoSang {
+    class TipoSanguineo {
+        <<enumeration>>
+        A_POSITIVO
+        A_NEGATIVO
+        B_POSITIVO
+        B_NEGATIVO
+        AB_POSITIVO
+        AB_NEGATIVO
+        O_POSITIVO
+        O_NEGATIVO
+        NAO_INFORMADO
         -String tipo
-        +TipoSang()
-        +TipoSang(String)
         +getTipo() String
-        +setTipo(String) void
     }
 
     class Hemocomponente {
@@ -97,6 +104,21 @@ classDiagram
         ENVIADA
     }
 
+    class StatusPedido {
+        <<enumeration>>
+        PENDENTE
+        EM_ATENDIMENTO
+        ATENDIDO
+        CANCELADO
+    }
+
+    class StatusAnalise {
+        <<enumeration>>
+        EM_ANALISE
+        APROVADA
+        REPROVADA
+    }
+
     class Hospital {
         -int codigo
         -String razaoSocial
@@ -114,28 +136,47 @@ classDiagram
         +setEndereco(Endereco) void
     }
 
+    class PedidoSangue {
+        -TipoSanguineo tipoSanguineo
+        -int quantidadeSolicitada
+        -int quantidadeAtendida
+        +PedidoSangue()
+        +PedidoSangue(TipoSanguineo, int, int)
+        +getTipoSanguineo() TipoSanguineo
+        +setTipoSanguineo(TipoSanguineo) void
+        +getQuantidadeSolicitada() int
+        +setQuantidadeSolicitada(int) void
+        +getQuantidadeAtendida() int
+        +setQuantidadeAtendida(int) void
+        +getQuantidadeRestante() int
+        +isAtendido() boolean
+        +adicionarBaixa() void
+    }
+
     class Pedido {
         -int numero
         -LocalDate dataSolicitacao
         -LocalDate dataEnvio
-        -String status
+        -StatusPedido status
         -Hospital hospital
-        -List~TipoSang~ tipos
+        -List~PedidoSangue~ itens
         +Pedido()
-        +Pedido(int, LocalDate, LocalDate, String, Hospital, List~TipoSang~)
+        +Pedido(int, LocalDate, LocalDate, StatusPedido, Hospital, List~PedidoSangue~)
+        +adicionarItem(TipoSanguineo, int) void
+        +darBaixa(Coleta) boolean
+        +isTotalmenteAtendido() boolean
         +getNumero() int
         +setNumero(int) void
         +getDataSolicitacao() LocalDate
         +setDataSolicitacao(LocalDate) void
         +getDataEnvio() LocalDate
         +setDataEnvio(LocalDate) void
-        +getStatus() String
-        +setStatus(String) void
+        +getStatus() StatusPedido
+        +setStatus(StatusPedido) void
         +getHospital() Hospital
         +setHospital(Hospital) void
-        +getTipos() List~TipoSang~
-        +setTipos(List~TipoSang~) void
-        +adicionarTipo(TipoSang) void
+        +getItens() List~PedidoSangue~
+        +setItens(List~PedidoSangue~) void
     }
 
     class Coleta {
@@ -148,58 +189,45 @@ classDiagram
         -Pedido pedido
         +Coleta()
         +Coleta(int, LocalDate, LocalDate, StatusColeta, Doador, Funcionario, Pedido)
+        +temPedido() boolean
+        +getTipoSanguineo() TipoSanguineo
         +getCodigo() int
         +setCodigo(int) void
-        +getDataColeta() LocalDate
-        +setDataColeta(LocalDate) void
-        +getDataValidade() LocalDate
-        +setDataValidade(LocalDate) void
         +getStatus() StatusColeta
         +setStatus(StatusColeta) void
-        +getDoador() Doador
-        +setDoador(Doador) void
-        +getFuncionario() Funcionario
-        +setFuncionario(Funcionario) void
-        +getPedido() Pedido
-        +setPedido(Pedido) void
     }
 
     class Analise {
         -int codigo
-        -String status
+        -StatusAnalise status
         -Coleta coleta
         -Tecnico tecnico
         -List~Producao~ producao
         +Analise()
-        +Analise(int, String, Coleta, Tecnico)
+        +Analise(int, StatusAnalise, Coleta, Tecnico)
+        +isAprovada() boolean
         +getCodigo() int
         +setCodigo(int) void
-        +getStatus() String
-        +setStatus(String) void
-        +getColeta() Coleta
-        +setColeta(Coleta) void
-        +getTecnico() Tecnico
-        +setTecnico(Tecnico) void
-        +getProducao() List~Producao~
-        +setProducao(List~Producao~) void
-        +adicionarProducao(Hemocomponente, int) void
+        +getStatus() StatusAnalise
+        +setStatus(StatusAnalise) void
+        +adicionarProducao(Hemocomponente, double) void
     }
 
     class Producao {
         -Analise analise
         -Hemocomponente hemocomponente
-        -int volumeMl
+        -double volumeMl
         +Producao()
-        +Producao(Analise, Hemocomponente, int)
+        +Producao(Analise, Hemocomponente, double)
         +getAnalise() Analise
         +setAnalise(Analise) void
         +getHemocomponente() Hemocomponente
         +setHemocomponente(Hemocomponente) void
-        +getVolumeMl() int
-        +setVolumeMl(int) void
+        +getVolumeMl() double
+        +setVolumeMl(double) void
     }
 
-    %% Heranca (Generalizacao Pessoa)
+    %% Heranca
     Pessoa <|-- Doador
     Pessoa <|-- Funcionario
     Pessoa <|-- Tecnico
@@ -207,16 +235,18 @@ classDiagram
     %% Relacionamentos
     Pessoa "*" --> "1" Endereco : Reside
     Hospital "*" --> "1" Endereco : Pertence
-    Doador "*" --> "1" TipoSang : Possui
+    Doador "*" --> "1" TipoSanguineo : Possui
     Coleta "*" --> "1" Doador : Realiza
     Coleta "*" --> "1" Funcionario : Coleta
-    Coleta "*" --> "0..1" Pedido : Gera
+    Coleta "*" --> "0..1" Pedido : Gera / Vinculada
     Coleta --> StatusColeta
     Analise "1" --> "1" Coleta : Possui
     Analise "*" --> "1" Tecnico : Faz
+    Analise --> StatusAnalise
     Analise "1" *-- "*" Producao : Produz
-    Producao "*" --> "1" Hemocomponente
+    Producao "*" --> "1" Hemocomponente : Extrai
     Pedido "*" --> "1" Hospital : Realiza
-    Pedido "*" --> "1..*" TipoSang : Tem
+    Pedido --> StatusPedido
+    Pedido "1" *-- "1..*" PedidoSangue : Contém
+    PedidoSangue "*" --> "1" TipoSanguineo : Requisita
 ```
-

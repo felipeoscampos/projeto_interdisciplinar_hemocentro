@@ -6,26 +6,68 @@ public class Pedido {
     private int numero;
     private LocalDate dataSolicitacao;
     private LocalDate dataEnvio;
-    private String status;
+    private StatusPedido status;
     private Hospital hospital;
-    private List<TipoSang> tipos;
+    private List<PedidoSangue> itens;
 
     public Pedido() {
-        numero = 0;
-        dataSolicitacao = null;
-        dataEnvio = null;
-        status = "";
-        hospital = null;
-        tipos = new ArrayList<>();
+        this.numero = 0;
+        this.dataSolicitacao = LocalDate.now();
+        this.dataEnvio = null;
+        this.status = StatusPedido.PENDENTE;
+        this.hospital = new Hospital();
+        this.itens = new ArrayList<>();
     }
 
-    public Pedido(int numero, LocalDate dataSolicitacao, LocalDate dataEnvio, String status, Hospital hospital, List<TipoSang> tipos) {
+    public Pedido(int numero, LocalDate dataSolicitacao, LocalDate dataEnvio, StatusPedido status, Hospital hospital, List<PedidoSangue> itens) {
         this.numero = numero;
         this.dataSolicitacao = dataSolicitacao;
         this.dataEnvio = dataEnvio;
         this.status = status;
-        this.hospital = hospital;
-        this.tipos = tipos;
+        this.hospital = (hospital != null) ? hospital : new Hospital();
+        this.itens = (itens != null) ? itens : new ArrayList<>();
+    }
+
+    public void adicionarItem(TipoSanguineo tipoSanguineo, int quantidadeBolsas) {
+        for (PedidoSangue item : this.itens) {
+            if (item.getTipoSanguineo() == tipoSanguineo) {
+                item.setQuantidadeSolicitada(item.getQuantidadeSolicitada() + quantidadeBolsas);
+                return;
+            }
+        }
+        this.itens.add(new PedidoSangue(tipoSanguineo, quantidadeBolsas, 0));
+    }
+
+    public boolean darBaixa(Coleta coleta) {
+        if (coleta == null) return false;
+
+        TipoSanguineo tipo = coleta.getTipoSanguineo();
+        for (PedidoSangue item : this.itens) {
+            if (item.getTipoSanguineo() == tipo && !item.isAtendido()) {
+                item.adicionarBaixa();
+                coleta.setPedido(this);
+                coleta.setStatus(StatusColeta.ENVIADA);
+
+                if (isTotalmenteAtendido()) {
+                    this.status = StatusPedido.ATENDIDO;
+                    this.dataEnvio = LocalDate.now();
+                } else {
+                    this.status = StatusPedido.EM_ATENDIMENTO;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isTotalmenteAtendido() {
+        if (itens.isEmpty()) return false;
+        for (PedidoSangue item : itens) {
+            if (!item.isAtendido()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public int getNumero() {
@@ -52,11 +94,11 @@ public class Pedido {
         this.dataEnvio = dataEnvio;
     }
 
-    public String getStatus() {
+    public StatusPedido getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusPedido status) {
         this.status = status;
     }
 
@@ -65,19 +107,14 @@ public class Pedido {
     }
 
     public void setHospital(Hospital hospital) {
-        this.hospital = hospital;
+        this.hospital = (hospital != null) ? hospital : new Hospital();
     }
 
-    public List<TipoSang> getTipos() {
-        return tipos;
+    public List<PedidoSangue> getItens() {
+        return itens;
     }
 
-    public void setTipos(List<TipoSang> tipos) {
-        this.tipos = tipos;
+    public void setItens(List<PedidoSangue> itens) {
+        this.itens = (itens != null) ? itens : new ArrayList<>();
     }
-
-    public void adicionarTipo(TipoSang tipo) {
-        tipos.add(tipo);
-    }
-
 }

@@ -1,2 +1,4 @@
-bin/
-*.class
+# Arquivos temporarios e compactados
+*.zip
+.DS_Store
+Thumbs.db

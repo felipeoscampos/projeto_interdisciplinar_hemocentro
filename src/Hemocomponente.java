@@ -3,8 +3,8 @@ public class Hemocomponente {
     private String nome;
 
     public Hemocomponente() {
-        sigla = "";
-        nome = "";
+        this.sigla = "";
+        this.nome = "";
     }
 
     public Hemocomponente(String sigla, String nome) {
@@ -27,5 +27,4 @@ public class Hemocomponente {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
 }

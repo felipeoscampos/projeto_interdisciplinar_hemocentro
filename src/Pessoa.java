@@ -6,11 +6,11 @@ public class Pessoa {
     private Endereco endereco;
 
     public Pessoa() {
-        codigo = 0;
-        nome = "";
-        cpf = "";
-        telefone = "";
-        endereco = null;
+        this.codigo = 0;
+        this.nome = "";
+        this.cpf = "";
+        this.telefone = "";
+        this.endereco = new Endereco();
     }
 
     public Pessoa(int codigo, String nome, String cpf, String telefone, Endereco endereco) {
@@ -18,7 +18,7 @@ public class Pessoa {
         this.nome = nome;
         this.cpf = cpf;
         this.telefone = telefone;
-        this.endereco = endereco;
+        this.endereco = (endereco != null) ? endereco : new Endereco();
     }
 
     public int getCodigo() {
@@ -60,5 +60,4 @@ public class Pessoa {
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
-
 }

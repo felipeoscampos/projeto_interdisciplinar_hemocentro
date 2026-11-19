@@ -7,12 +7,12 @@ public class Endereco {
     private String uf;
 
     public Endereco() {
-        codigo = 0;
-        logradouro = "";
-        numero = "";
-        cep = "";
-        cidade = "";
-        uf = "";
+        this.codigo = 0;
+        this.logradouro = "";
+        this.numero = "";
+        this.cep = "";
+        this.cidade = "";
+        this.uf = "";
     }
 
     public Endereco(int codigo, String logradouro, String numero, String cep, String cidade, String uf) {
@@ -71,5 +71,4 @@ public class Endereco {
     public void setUf(String uf) {
         this.uf = uf;
     }
-
 }

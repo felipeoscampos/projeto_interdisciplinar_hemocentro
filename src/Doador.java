@@ -1,22 +1,21 @@
 public class Doador extends Pessoa {
-    private TipoSang tipoSanguineo;
+    private TipoSanguineo tipoSanguineo;
 
     public Doador() {
         super();
-        tipoSanguineo = null;
+        this.tipoSanguineo = TipoSanguineo.NAO_INFORMADO;
     }
 
-    public Doador(int codigo, String nome, String cpf, String telefone, Endereco endereco, TipoSang tipoSanguineo) {
+    public Doador(int codigo, String nome, String cpf, String telefone, Endereco endereco, TipoSanguineo tipoSanguineo) {
         super(codigo, nome, cpf, telefone, endereco);
-        this.tipoSanguineo = tipoSanguineo;
+        this.tipoSanguineo = (tipoSanguineo != null) ? tipoSanguineo : TipoSanguineo.NAO_INFORMADO;
     }
 
-    public TipoSang getTipoSanguineo() {
+    public TipoSanguineo getTipoSanguineo() {
         return tipoSanguineo;
     }
 
-    public void setTipoSanguineo(TipoSang tipoSanguineo) {
+    public void setTipoSanguineo(TipoSanguineo tipoSanguineo) {
         this.tipoSanguineo = tipoSanguineo;
     }
-
 }

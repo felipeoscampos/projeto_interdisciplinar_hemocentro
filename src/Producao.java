@@ -1,17 +1,17 @@
 public class Producao {
     private Analise analise;
     private Hemocomponente hemocomponente;
-    private int volumeMl;
+    private double volumeMl;
 
     public Producao() {
-        analise = null;
-        hemocomponente = null;
-        volumeMl = 0;
+        this.analise = new Analise();
+        this.hemocomponente = new Hemocomponente();
+        this.volumeMl = 0.0;
     }
 
-    public Producao(Analise analise, Hemocomponente hemocomponente, int volumeMl) {
-        this.analise = analise;
-        this.hemocomponente = hemocomponente;
+    public Producao(Analise analise, Hemocomponente hemocomponente, double volumeMl) {
+        this.analise = (analise != null) ? analise : new Analise();
+        this.hemocomponente = (hemocomponente != null) ? hemocomponente : new Hemocomponente();
         this.volumeMl = volumeMl;
     }
 
@@ -20,7 +20,7 @@ public class Producao {
     }
 
     public void setAnalise(Analise analise) {
-        this.analise = analise;
+        this.analise = (analise != null) ? analise : new Analise();
     }
 
     public Hemocomponente getHemocomponente() {
@@ -28,15 +28,14 @@ public class Producao {
     }
 
     public void setHemocomponente(Hemocomponente hemocomponente) {
-        this.hemocomponente = hemocomponente;
+        this.hemocomponente = (hemocomponente != null) ? hemocomponente : new Hemocomponente();
     }
 
-    public int getVolumeMl() {
+    public double getVolumeMl() {
         return volumeMl;
     }
 
-    public void setVolumeMl(int volumeMl) {
+    public void setVolumeMl(double volumeMl) {
         this.volumeMl = volumeMl;
     }
-
 }

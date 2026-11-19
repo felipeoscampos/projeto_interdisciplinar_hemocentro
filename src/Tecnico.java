@@ -4,13 +4,11 @@ public class Tecnico extends Pessoa {
     public Tecnico() {
         super();
         this.coren = "";
-
     }
 
     public Tecnico(int codigo, String nome, String cpf, String telefone, Endereco endereco, String coren) {
         super(codigo, nome, cpf, telefone, endereco);
         this.coren = coren;
-
     }
 
     public String getCoren() {
@@ -20,5 +18,4 @@ public class Tecnico extends Pessoa {
     public void setCoren(String coren) {
         this.coren = coren;
     }
-
 }
